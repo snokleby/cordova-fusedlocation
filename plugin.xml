@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="com.snoklecorp.fusedlocation"
+    version="0.1.0">
+
+    <engines>
+        <engine name="cordova" version=">=3.0.0" />
+    </engines>
+    
+    <name>FusedLocation</name>
+
+    <description>FusedLocation plugin for Cordova/PhoneGap</description>
+
+    <author>Sverre Nøkleby</author>
+
+    <keywords>GeoLocation, Location, Cordova, PhoneGap</keywords>
+
+    <license>MIT</license>
+
+    <js-module src="www/FusedLocation.js" name="FusedLocation">
+        <clobbers target="cordova.plugins.FusedLocation" />
+    </js-module>
+   
+    <!-- Android -->
+    <platform name="android">
+        <framework src="com.google.android.gms:play-services-location:7.0.0" />
+        <source-file src="src/android/FusedLocationHelper.java" target-dir="src/com/snoklecorp/cordova/fusedlocation" />
+    
+        <source-file src="src/android/FusedLocation.java" target-dir="src/com/snoklecorp/cordova/fusedlocation" /> 
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="FusedLocation">
+                <param name="android-package" value="com.snoklecorp.fusedlocation.FusedLocation" />
+            </feature>
+        </config-file>
+    </platform>
+</plugin>
