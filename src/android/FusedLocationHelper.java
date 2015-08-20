@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.IntentSender.SendIntentException;
 import android.content.SharedPreferences;
+import android.content.DialogInterface;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,6 +35,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
+
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -41,6 +44,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationRequest;
@@ -67,16 +71,38 @@ public class FusedLocationHelper extends Activity implements GoogleApiClient.Con
 
     public void GetLocation(CallbackContext cb) {
         mGetAddress = false;
+		mCallBackWhenGotLocation = cb;
+		CheckForPlayServices();
         SetupLocationFetching(cb);
     }
     
     public void GetAddress(CallbackContext cb) {
         mGetAddress = true;
+		mCallBackWhenGotLocation = cb;
+		CheckForPlayServices();
         SetupLocationFetching(cb);
     }
 
+	protected void CheckForPlayServices() {
+		int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mActivity);
+		if (status != ConnectionResult.SUCCESS) {
+			Dialog errorDialog = GooglePlayServicesUtil.getErrorDialog(status, mActivity, 10, new DialogInterface.OnCancelListener() {
+
+            @Override
+            public void onCancel(DialogInterface dialog) {
+              ErrorHappened("onCancel called on ErrorDialog. ");
+            }
+			});
+			 if (errorDialog != null) {
+                errorDialog.show();
+            } else {
+				ErrorHappened("CheckForPlayServices failed. Error code: " + status);
+			}
+		}
+	}
+
     protected void SetupLocationFetching(CallbackContext cb) {
-         mCallBackWhenGotLocation = cb;
+
          buildGoogleApiClient();
 		 createLocationRequest();
          buildLocationSettingsRequest();
@@ -192,6 +218,7 @@ public class FusedLocationHelper extends Activity implements GoogleApiClient.Con
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	  Log.i(TAG, "onActivityResult called with reqestCode " + requestCode + " and resultCode " +resultCode);
         switch (requestCode) {
             // Check for the integer request code originally supplied to startResolutionForResult().
             case REQUEST_CHECK_SETTINGS:
@@ -205,7 +232,7 @@ public class FusedLocationHelper extends Activity implements GoogleApiClient.Con
                         break;
                 }
                 break;
-        }
+          }		
     }
     
     @Override
@@ -214,10 +241,10 @@ public class FusedLocationHelper extends Activity implements GoogleApiClient.Con
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        ErrorHappened("onConnectionFailed.");
+    public void onConnectionFailed(ConnectionResult result) {           
+		ErrorHappened("onConnectionFailed. Error code: " + result.getErrorCode());
     }
-
+   
     @Override
     public void onConnectionSuspended(int cause) {
         // The connection to Google Play services was lost for some reason. We call connect() to
