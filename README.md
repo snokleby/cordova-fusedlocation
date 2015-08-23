@@ -1,7 +1,7 @@
 # cordova-fusedlocation
 This is a Cordova/PhoneGap plugin that uses the Android Fused Location Provider.
 
-I made this plugin to get better GeoLocation in [WeatherPerfect](https://twitter.com/weather_perfect).
+I made this plugin to get better GeoLocation in [WeatherPerfect](https://play.google.com/store/apps/details?id=com.snoklecorp.weatherperfect).
 
 ## Usage:
 ```
